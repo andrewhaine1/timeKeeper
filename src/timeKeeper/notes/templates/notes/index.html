@@ -1,0 +1,52 @@
+{% extends "timeKeeper/base.html" %}
+
+{% load getvaluefromdict %}
+
+{% block title %}TimeKeeper - Notes{% endblock %}
+
+{% block content %}
+{% if notes %}
+<div style="text-align: right;">
+    <a href="{% url 'notes:create' %}" style="text-decoration: none;color:rgb(27, 106, 197);">Create</a>
+</div>
+
+<div class="accordion" id="accordionExample">
+    {% for note in notes %}
+    <div class="accordion-item" style="margin: 0 0 10px 0;">
+        <h2 class="accordion-header" id="headingOne">
+            <div class="row" style="margin: 0;">
+                <div class="col-md-11" style="padding: 0;">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#collapse{{note.id}}" aria-expanded="true" aria-controls="collapseOne">
+                        {{ note.title }}
+                    </button>
+                </div>
+                <div class="col-md-1" style="padding: 0;">
+                    <a class="btn btn-danger" style="width: 100%;height:100%;padding: 12px 0 0 0;border-radius: 0;">DELETE</a>
+                </div>
+            </div>
+        </h2>
+        <div id="collapse{{note.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <div class="row">
+                    <div class="col-md-11">
+                        {{ note.text }}
+                    </div>
+                    <div class="col-md-1">
+                        <div style="display: table;height: 100%;width: 100%;">
+                            <a href="" style="display: table-cell;vertical-align: bottom;text-align: right;">edit</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<p style="text-align: center;">You have not created any notes yet. Click <a href="{% url 'notes:create' %}">here</a>
+    to create.
+</p>
+{% endif %}
+{% endblock %}

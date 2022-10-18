@@ -1,0 +1,101 @@
+{% extends "timeKeeper/base.html" %}
+
+{% block title %}TimeKeeper - Delete tasks{% endblock %}
+
+{% block content %}
+<style>
+    .action-ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .action-ul-li {
+        float: left;
+        width: 150px;
+        margin: 0 10px 0 0;
+        border-radius: 2px;
+    }
+
+    .action-ul-li-a {
+        text-decoration: none;
+        display: table-cell;
+        vertical-align: middle;
+        width: 150px;
+        border: 1px solid rgb(157, 157, 157);
+        text-align: center;
+        color: azure;
+        cursor: pointer;
+        height: 25px;
+        border-radius: 2px;
+    }
+
+    .tk-bg-success {
+        background-color: rgb(59, 137, 59);
+    }
+
+    .tk-bg-danger {
+        background-color: rgb(170, 66, 66);
+    }
+</style>
+<div style="width: 60%;margin: auto;">
+    <h2>Are you sure you would like to delete this task?</h2>
+
+    <div style="margin:40px 0 0 0">
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Short description: </strong>
+                    </td>
+                    <td>
+                        {{ task.short_description }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Full description: </strong>
+                    </td>
+                    <td>
+                        {{ task.full_description }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Task status: </strong>
+                    </td>
+                    <td>
+                        {{ task.task_status }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>due_date: </strong>
+                    </td>
+                    <td>
+                        {{ task.due_date }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin: 50px 0 0 0;">
+        <ul class="action-ul">
+            <li class="action-ul-li">
+                <a class="action-ul-li-a tk-bg-success" href="{% url 'tasks:index' %}">Back</a>
+            </li>
+            <li class="action-ul-li">
+                <a class="action-ul-li-a tk-bg-danger">
+                    <form method="post" action="{% url 'tasks:delete' task.id %}">
+                        {% csrf_token %}
+                        <input class="action-ul-li-a tk-bg-danger" style="border: none;" type="submit" value="Delete">
+                    </form>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

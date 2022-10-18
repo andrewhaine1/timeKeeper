@@ -1,0 +1,13 @@
+{% extends "timeKeeper/base.html" %}
+
+{% block title %}TimeKeeper - Create Note{% endblock %}
+
+<div><a href="{}">Back</a></div>
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+{% crispy form form.helper %}
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% load slashtoangle %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Site title{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous"> -->
+    <!-- <link rel="stylesheet" href="static/libs/splide-4.1.3/dist/css/splide.min.css"> -->
+    <link href="/static/libs/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/libs/site/css/tk.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <!-- <a class="navbar-brand" href="#">Navbar</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button> -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'home:index' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'tasks:index' %}">Tasks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'notes:index' %}">Notes</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+              </li> -->
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ user.username | capfirst }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Log out</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if request.path == '/' %}
+    <!-- <p>Will need something here</p> -->
+    <!-- <section class="splide" aria-label="Splide Basic HTML Example">
+        <div class="splide__track">
+            <ul class="splide__list">
+                <li class="splide__slide">Slide 01</li>
+                <li class="splide__slide">Slide 02</li>
+                <li class="splide__slide">Slide 03</li>
+            </ul>
+        </div>
+    </section> -->
+    <div class="home-hero-outer">
+        <div class="row" style="margin: 0 !important;">
+            <div class="col-md-5" style="display: inline;float:left;">
+                <div class="hero-bg-image-outer">
+                    <img src="/static/images/azure-devops.jfif" class="hero-bg-image" alt="hero-bg">
+                </div>
+            </div>
+            <div class="col-md-7" style="display: inline;float:left;">
+                <div style="padding: 80px;">
+                    <h1 class="hero-bg-title hero-bg-title-main">It's ugly</h1>
+                    <h1 class="hero-bg-title hero-bg-title-sub">It's dirty</h1>
+
+
+
+                    <ul style="list-style-type: none;margin: 0;padding: 0;">
+                        <li style="display: inline;float: left;">
+                            <h1 id="hero-title-last" class="hero-bg-title hero-bg-title-sub hero-title-last">
+                                But it works real good
+                            </h1>
+                        </li>
+                        <li style="display: inline;float: left;">
+                            <img id="hero-title-last-blinker" class="hero-title-last-blinker" src="/static/images/blinkers.gif"  alt="blinkers">
+                        </li>
+                    </ul>
+
+                    <!-- <div class="row">
+                        <div class="col-md-9">
+                            
+                        </div>
+                        <div class="col-md-3">
+                            
+                        </div>
+                    </div> -->
+                    <!-- <button id="hero-title-button" class="btn btn-primary hero-btn">Test</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="content-container-outer">
+        {% if request.path != '/' %}
+        <div class="content-container-breadcrumb">
+            <p style="margin: 0;padding: 0;display: block;">
+                <strong>Current route: </strong>{{ request.path | slashtoangle }}
+            </p>
+        </div>
+        <div id="content" class="content-container">
+            {% block content %}{% endblock %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript Bundle with Popper -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script> -->
+    <script src="/static/libs/jquery/jquery-3.6.1.min.js"></script>
+    <script src="/static/libs/jquery-ui-1.13.2.custom/jquery-ui.min.js"></script>
+    <script src="/static/libs/bootstrap-5.0.2-dist/js/popper.min.js"></script>
+    <script src="/static/libs/bootstrap-5.0.2-dist/js/bootstrap.min.js"></script>
+    <script>
+        // $(".hero-bg-image").effect('fade', { percent: 50 }, 500, callback);
+        // Callback function to bring a hidden box back
+        // function callback() { };
+
+        $(".hero-bg-image").show("slide", { direction: "left", }, 1500);
+
+        var fadeTime = 500
+
+        $(".hero-bg-title").each(function (i, obj) {
+            fadeTime += 500
+
+            if (i != 2) {
+                $(this).show("slide", { direction: "down", }, fadeTime);
+            }
+            else {
+                fadeTime -= 200
+                $(this).show("slide", { direction: "down", }, fadeTime, function() {
+                    $('.hero-title-last-blinker').show();
+                });
+                
+            }
+        })
+
+        $('document').ready(function () {
+            const titleWidth = $('#hero-title-last').width();
+            $('#hero-title-button').width(titleWidth);
+            $('#hero-title-button').show("slide", { direction: "left", }, 1500);
+            
+        });
+
+    </script>
+    <!-- <script src="static/libs/splide-4.1.3/dist/js/splide.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var splide = new Splide('.splide');
+            splide.mount();
+        });
+    </script> -->
+</body>
+
+</html>

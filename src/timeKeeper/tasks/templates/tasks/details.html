@@ -1,0 +1,131 @@
+{% extends "timeKeeper/base.html" %}
+
+{% block title %}TimeKeeper - Task details{% endblock %}
+
+{% block content %}
+<style>
+    .action-ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .action-ul-li {
+        float: left;
+        width: 150px;
+        margin: 0 10px 0 0;
+        border-radius: 2px;
+    }
+
+    .action-ul-li-a {
+        text-decoration: none;
+        display: table-cell;
+        vertical-align: middle;
+        width: 150px;
+        border: 1px solid rgb(157, 157, 157);
+        text-align: center;
+        color: azure;
+        cursor: pointer;
+        height: 25px;
+        border-radius: 2px;
+    }
+
+    .tk-bg-success {
+        background-color: rgb(59, 137, 59);
+    }
+
+    .tk-bg-primary {
+        background-color: rgb(43, 90, 152);
+    }
+
+    .tk-bg-danger {
+        background-color: rgb(170, 66, 66);
+    }
+
+    td { min-width: 200px; }
+</style>
+<div style="width: 100%;margin: auto;">
+    <h2>Task details</h2>
+
+    <div style="margin:40px 0 0 0">
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Short description: </strong>
+                    </td>
+                    <td>
+                        {{ task.short_description }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Full description: </strong>
+                    </td>
+                    <td>
+                        <p>{{ task.full_description|linebreaks }}</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Status: </strong>
+                    </td>
+                    <td>
+                        {{ task.task_status }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Due: </strong>
+                    </td>
+                    <td>
+                        {{ task.due_date }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Created: </strong>
+                    </td>
+                    <td>
+                        {{ task.date_created }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Updated: </strong>
+                    </td>
+                    <td>
+                        {{ task.date_updated }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin: 50px 0 0 0;">
+        <ul class="action-ul">
+            <li class="action-ul-li">
+                <a class="action-ul-li-a tk-bg-success" href="{% url 'tasks:index' %}">Back</a>
+            </li>
+            <li class="action-ul-li">
+                <a class="action-ul-li-a tk-bg-primary" href="{% url 'tasks:edit' task.id %}">Edit</a>
+            </li>
+            <li class="action-ul-li">
+                <a class="action-ul-li-a tk-bg-danger" href="{% url 'tasks:delete' task.id %}">Delete</a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
