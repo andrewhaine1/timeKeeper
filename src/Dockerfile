@@ -8,6 +8,10 @@ WORKDIR /usr/src/app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
+ENV HTTP_PROXY http://proxyo.fnb.co.za:8080
+ENV HTTPS_PROXY http://proxyo.fnb.co.za:8080
+ENV NO_PROXY localhost,127.0.0.1,*.fnb.co.za
+
 # install dependencies
 RUN pip install --upgrade pip 
 COPY ./requirements.txt /usr/src/app
