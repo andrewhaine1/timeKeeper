@@ -1,5 +1,5 @@
 # pull the official base image
-FROM python:3.10.6-alpine
+FROM 995387998854.dkr.ecr.af-south-1.amazonaws.com/python:3.10.6-alpine
 
 # set work directory
 WORKDIR /usr/src/app
