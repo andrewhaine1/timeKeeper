@@ -9,7 +9,6 @@
 <div style="text-align: right;">
     <a href="{% url 'notes:create' %}" style="text-decoration: none;color:rgb(27, 106, 197);">Create</a>
 </div>
-
 <div class="accordion" id="accordionExample">
     {% for note in notes %}
     <div class="accordion-item" style="margin: 0 0 10px 0;">
@@ -22,7 +21,8 @@
                     </button>
                 </div>
                 <div class="col-md-1" style="padding: 0;">
-                    <a class="btn btn-danger" style="width: 100%;height:100%;padding: 12px 0 0 0;border-radius: 0;">DELETE</a>
+                    <a class="btn btn-danger" style="width: 100%;height:100%;padding: 12px 0 0 0;border-radius: 0;"
+                    href="{% url 'notes:delete' note.id %}">DELETE</a>
                 </div>
             </div>
         </h2>
@@ -34,7 +34,8 @@
                     </div>
                     <div class="col-md-1">
                         <div style="display: table;height: 100%;width: 100%;">
-                            <a href="" style="display: table-cell;vertical-align: bottom;text-align: right;">edit</a>
+                            <a style="display: table-cell;vertical-align: bottom;text-align: right;"
+                            href="{% url 'notes:edit' note.id %}">edit</a>
                         </div>
                     </div>
                 </div>

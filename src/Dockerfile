@@ -1,5 +1,6 @@
 # pull the official base image
 FROM 995387998854.dkr.ecr.af-south-1.amazonaws.com/python:3.10.6-alpine
+#FROM python:3.10.6-alpine
 
 # set work directory
 WORKDIR /usr/src/app
@@ -19,6 +20,7 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY ./timeKeeper /usr/src/app
+RUN python manage.py migrate
 
 EXPOSE 8000
 

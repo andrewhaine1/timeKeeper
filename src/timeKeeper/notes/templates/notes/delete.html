@@ -1,0 +1,89 @@
+{% extends "timeKeeper/base.html" %}
+
+{% block title %}TimeKeeper - Delete note{% endblock %}
+
+{% block content %}
+<style>
+    .action-ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .action-ul-li {
+        float: left;
+        width: 150px;
+        margin: 0 10px 0 0;
+        border-radius: 2px;
+    }
+
+    .action-ul-li-a {
+        text-decoration: none;
+        display: table-cell;
+        vertical-align: middle;
+        width: 150px;
+        border: 1px solid rgb(157, 157, 157);
+        text-align: center;
+        color: azure;
+        cursor: pointer;
+        height: 25px;
+        border-radius: 2px;
+    }
+
+    .action-ul-li-btn {
+        width: 150px;
+        border: 1px solid rgb(157, 157, 157);
+        border-radius: 2px;
+    }
+
+    .tk-bg-success {
+        background-color: rgb(59, 137, 59);
+    }
+
+    .tk-bg-danger {
+        background-color: rgb(170, 66, 66);
+    }
+</style>
+<div style="width: 60%;margin: auto;">
+    <h2>Are you sure you would like to delete this note?</h2>
+
+    <div style="margin:40px 0 0 0">
+        <table>
+            <thead>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Title: </strong>
+                    </td>
+                    <td>
+                        {{ note.title }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Details: </strong>
+                    </td>
+                    <td>
+                        {{ note.text }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin: 50px 0 0 0;">
+        <ul class="action-ul">
+            <li class="action-ul-li">
+                <a class="action-ul-li-a btn btn-success" href="{% url 'notes:index' %}">Back</a>
+            </li>
+            <li class="action-ul-li">
+                <form method="post" action="{% url 'notes:delete' note.id %}">
+                    {% csrf_token %}
+                    <input class="action-ul-li-btn btn btn-danger" type="submit" value="Delete">
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
