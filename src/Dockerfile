@@ -8,6 +8,9 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV DJANGO_SUPERUSER_EMAIL 'demo-user@timekeeper.io'
+ENV DJANGO_SUPERUSER_USERNAME 'demo-admin'
+ENV DJANGO_SUPERUSER_PASSWORD 'DemoAdmin!10'
 
 ENV HTTP_PROXY http://proxyo.fnb.co.za:8080
 ENV HTTPS_PROXY http://proxyo.fnb.co.za:8080
@@ -21,6 +24,7 @@ RUN pip install -r requirements.txt
 # copy project
 COPY ./timeKeeper /usr/src/app
 RUN python manage.py migrate
+RUN django-admin createsuperuser --noinput
 
 EXPOSE 8000
 
