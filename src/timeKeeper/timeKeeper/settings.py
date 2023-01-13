@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-m5#lb@ve6q%ufgais4fwccj6b1b)h07c3w3p3yy!2(oau$v1a3
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost','timekeeper-dev.crsa-aws-nonprod.fnb.co.za']
-
+CSRF_TRUSTED_ORIGINS = ['127.0.0.1','localhost','timekeeper-dev.crsa-aws-nonprod.fnb.co.za']
 
 # Application definition
 
