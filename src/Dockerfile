@@ -24,7 +24,7 @@ RUN pip install -r requirements.txt
 # copy project
 COPY ./timeKeeper /usr/src/app
 RUN python manage.py migrate
-RUN django-admin createsuperuser --noinput
+RUN python manage.py createsuperuser --noinput
 
 EXPOSE 8000
 
