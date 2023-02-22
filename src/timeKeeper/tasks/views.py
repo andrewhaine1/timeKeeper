@@ -31,8 +31,6 @@ def index(request):
         else:
             all_tasks_statuses[task.id] = 'n/a'
 
-    print(all_tasks_statuses)
-
     context = {
         'all_tasks': all_tasks,
         'all_tasks_statuses': all_tasks_statuses

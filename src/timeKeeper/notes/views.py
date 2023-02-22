@@ -13,6 +13,13 @@ from notes.models import Note
 def index(request):
     template = loader.get_template('notes/index.html')
 
+    # # If user is not authenticated get all shared
+    # print(request.user.is_anonymous)
+
+    # # If user is authenticated, get all by user id
+    # print(request.user.is_authenticated)
+    # print(request.user.id)
+
     notes = Note.objects.all()
     context = {
         'message': "Lets get some notes here",
@@ -24,10 +31,10 @@ def index(request):
 def create(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
-        
+
         # create a form instance and populate it with data from the request:
         form = NotesForm(request.POST)
-        
+
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
@@ -37,7 +44,8 @@ def create(request):
             title = form.cleaned_data['title']
             text = form.cleaned_data['text']
 
-            result = Note.objects.create(title=title, text=text)
+            result = Note.objects.create(title=title, text=text,
+                owner=request.user)
 
             if (result):
                 return HttpResponseRedirect('/notes')
@@ -50,8 +58,21 @@ def create(request):
 
     return render(request, 'notes/create.html', {'form': form})
 
+@login_required(login_url='/accounts/login/')
 def details(request, note_id):
-    pass
+    note = Note.objects.get(pk=note_id)
+
+    try:
+        form = NotesForm()
+
+        form.fields['title'].initial = note.title
+        form.fields['text'].initial = note.text
+
+        template = loader.get_template('notes/details.html')
+        return HttpResponse(template.render({'form': form}, request))
+
+    except note.DoesNotExist:
+        raise Http404("Note does not exist")
 
 @login_required(login_url='/accounts/login/')
 def edit(request, note_id):

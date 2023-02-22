@@ -1,6 +1,5 @@
 # pull the official base image
 FROM 995387998854.dkr.ecr.af-south-1.amazonaws.com/python:3.10.6-alpine
-#FROM python:3.10.6-alpine
 
 # set work directory
 WORKDIR /usr/src/app
@@ -8,9 +7,9 @@ WORKDIR /usr/src/app
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-ENV DJANGO_SUPERUSER_EMAIL 'demo-user@timekeeper.io'
-ENV DJANGO_SUPERUSER_USERNAME 'demo-admin'
-ENV DJANGO_SUPERUSER_PASSWORD 'DemoAdmin!10'
+ENV DJANGO_SUPERUSER_EMAIL 'admin@timekeeper.io'
+ENV DJANGO_SUPERUSER_USERNAME 'timeadmin'
+ENV DJANGO_SUPERUSER_PASSWORD 'TimeAdmin!10'
 
 ENV HTTP_PROXY http://proxyo.fnb.co.za:8080
 ENV HTTPS_PROXY http://proxyo.fnb.co.za:8080
@@ -22,7 +21,7 @@ COPY ./requirements.txt /usr/src/app
 RUN pip install -r requirements.txt
 
 # copy project
-COPY ./timeKeeper /usr/src/app
+COPY ./timeKeeper .
 RUN python manage.py migrate
 RUN python manage.py createsuperuser --noinput
 
