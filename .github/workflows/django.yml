@@ -82,7 +82,7 @@ jobs:
         # Set the networking mode for the RUN instructions during build
         network: ''# optional
         # Do not use cache when building the image
-        no-cache: ''# optional, default is false
+        no-cache: false # optional, default is false
         # Do not cache specified stages
         no-cache-filters: ''# optional
         # List of output destinations (format: type=local,dest=path)
@@ -92,9 +92,9 @@ jobs:
         # Generate provenance attestation for the build (shorthand for --attest=type=provenance)
         provenance: ''# optional
         # Always attempt to pull all referenced images
-        pull: ''# optional, default is false
+        pull: false # optional, default is false
         # Push is a shorthand for --output=type=registry
-        push: ''# optional, default is false
+        push: false # optional, default is false
         # Generate SBOM attestation for the build (shorthand for --attest=type=sbom)
         sbom: ''# optional
         # List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)
