@@ -94,7 +94,7 @@ jobs:
         # Always attempt to pull all referenced images
         pull: false # optional, default is false
         # Push is a shorthand for --output=type=registry
-        push: false # optional, default is false
+        push: true # optional, default is false
         # Generate SBOM attestation for the build (shorthand for --attest=type=sbom)
         sbom: ''# optional
         # List of secrets to expose to the build (e.g., key=string, GIT_AUTH_TOKEN=mytoken)
