@@ -101,9 +101,9 @@ jobs:
         # use-kubelogin: # optional
     - name: Create Nginx Ingress Controller
       run: |
-        NAMESPACE=ingress-basic
+        NAMESPACE=${{ vars.TIMEKEEPER_NAMESPACE }}
         echo "Checking for ingress in namespace: $NAMESPACE"
-        if [ -z "$(kubectl get ingress --namespace ingress-basic)" ]
+        if [ -z "$(kubectl get ingress --namespace $NAMESPACE)" ]
         then
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
