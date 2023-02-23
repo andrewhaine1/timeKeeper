@@ -88,7 +88,7 @@ jobs:
         az account show
         echo "Resource group name: ${{ vars.AZ_AKS_RG_NAME }}"
         echo "AKS cluster name: ${{ vars.AZ_AKS_CLUSTER_NAME }}"
-    - name: Azure Kubernetes set context
+    - name: Azure Kubernetes Context
       uses: Azure/aks-set-context@v3
       with:
         # Resource Group Name
@@ -101,11 +101,14 @@ jobs:
         # admin: # optional
         # Enables kubelogin for non-admin user scenario. Values: true or false
         # use-kubelogin: # optional
+    - name: Create Namespace
+      run: |
+        kubectl create namespace ${{ vars.TIMEKEEPER_NAMESPACE }}
     - name: Deploy to Kubernetes cluster
       uses: Azure/k8s-deploy@v4.9
       with:
         # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
-        namespace: timekeeper
+        namespace: ${{ vars.TIMEKEEPER_NAMESPACE }}
         # Path to the manifest files which will be used for deployment.
         manifests: deployment/k8s/timekeeper/timekeeper-ingress.yaml, deployment/k8s/timekeeper/timekeeper-deployment.yaml
         # Fully qualified resource URL of the image(s) to be used for substitutions on the manifest files Example: contosodemo.azurecr.io/helloworld:test
