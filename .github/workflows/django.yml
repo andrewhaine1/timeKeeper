@@ -87,7 +87,7 @@ jobs:
         # Azure subscriptionId
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
-        #enable-AzPSSession: # optional
+        enable-AzPSSession: true # optional
         # Name of the environment. Supported values are azurecloud, azurestack, azureusgovernment, azurechinacloud, azuregermancloud. Default being azurecloud
         #environment: # optional, default is azurecloud
         # Set this value to true to enable support for accessing tenants without subscriptions
