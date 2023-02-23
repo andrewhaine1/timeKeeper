@@ -72,7 +72,7 @@ jobs:
         # Optional parent cgroup for the container used in the build
         cgroup-parent: ''# optional
         # Build's context is the set of files located in the specified PATH or URL
-        context: ''# optional
+        context: 'src'# optional
         # Path to the Dockerfile
         file: './src/Dockerfile'# optional
         # List of metadata for an image
