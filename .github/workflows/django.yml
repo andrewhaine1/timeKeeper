@@ -14,6 +14,10 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.10.6]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
     - uses: actions/checkout@v3
