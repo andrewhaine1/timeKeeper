@@ -103,7 +103,7 @@ jobs:
       run: |
         NAMESPACE=${{ vars.TIMEKEEPER_NAMESPACE }}
         echo "Checking for ingress in namespace: $NAMESPACE"
-        if [ -z "$(kubectl get ingress --namespace $NAMESPACE)" ]
+        if [ -z "$(kubectl get service --namespace ingress-basic)" ]
         then
           helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
           helm repo update
