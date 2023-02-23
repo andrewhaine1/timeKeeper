@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     environment: prod
@@ -14,10 +18,6 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.10.6]
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
 
     steps:
     - uses: actions/checkout@v3
@@ -94,6 +94,11 @@ jobs:
         #allow-no-subscriptions: # optional
         # Provide audience field for access-token. Default value is api://AzureADTokenExchange
         #audience: # optional, default is api://AzureADTokenExchange
+    - name: 'Run az commands'
+      run: |
+        az account show
+        az group list
+        pwd 
     - name: Deploy to Kubernetes cluster
       uses: Azure/k8s-deploy@v4.9
       with:
