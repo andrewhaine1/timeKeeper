@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: timekeeper-web
-        image: andrew86haine/timekeeper
+        image: andrew86haine/timekeeper:latest
         ports:
         - containerPort: 80
         # env:
