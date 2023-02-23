@@ -28,21 +28,10 @@ jobs:
     - name: Show dir contents
       run: |
         ls -l
-    - name: Output Run ID
-      run: echo ${{ github.run_id }}
-    - name: Output Run Number
-      run: echo ${{ github.run_number }}
-    - name: Output Run Attempt
-      run: echo ${{ github.run_attempt }}
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r src/requirements.txt
-    - shell: bash
-      env:
-        SUPER_SECRET: ${{ secrets.DOCKER_IO_USERNAME }}
-      run: |
-        echo "$SUPER_SECRET"
     - name: Docker Login
       # You may pin to the exact commit or the version.
       # uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -94,11 +83,24 @@ jobs:
         #allow-no-subscriptions: # optional
         # Provide audience field for access-token. Default value is api://AzureADTokenExchange
         #audience: # optional, default is api://AzureADTokenExchange
-    - name: 'Run az commands'
+    - name: 'AZ Account Show'
       run: |
         az account show
-        az group list
-        pwd 
+        echo "Resource group name: ${{ vars.AZ_AKS_RG_NAME }}"
+        echo "AKS cluster name: ${{ vars.AZ_AKS_CLUSTER_NAME }}"
+    - name: Azure Kubernetes set context
+      uses: Azure/aks-set-context@v3
+      with:
+        # Resource Group Name
+        resource-group: ${{ vars.AZ_AKS_RG_NAME }}
+        # AKS Cluster Name
+        cluster-name: ${{ vars.AZ_AKS_CLUSTER_NAME }}
+        # AKS Cluster Subscription
+        # subscription: # optional
+        # Get cluster admin credentials. Values: true or false
+        # admin: # optional
+        # Enables kubelogin for non-admin user scenario. Values: true or false
+        # use-kubelogin: # optional
     - name: Deploy to Kubernetes cluster
       uses: Azure/k8s-deploy@v4.9
       with:
