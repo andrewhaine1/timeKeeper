@@ -103,6 +103,12 @@ jobs:
         CLUSTER_NAME: ${{ vars.AZ_AKS_CLUSTER_NAME }}
         # Size of cluster (dev or test)
         CLUSTER_SIZE: dev
+        # Name for Storage Account
+        STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+        # Name for Storage Container
+        STORAGE_CONTAINER_NAME: ${{ vars.AZURE_STORAGE_CONTAINER_NAME }}
+        # Access Key for Storage Container
+        STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}
         
     - name: Azure Kubernetes Context
       uses: Azure/aks-set-context@v3
