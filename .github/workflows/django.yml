@@ -22,7 +22,6 @@ jobs:
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
-      if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create'
       with:
         python-version: ${{ matrix.python-version }}
         
