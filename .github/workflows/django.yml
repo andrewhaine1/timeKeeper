@@ -21,17 +21,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+        
     - name: Show dir contents
       run: |
         ls -l
+        
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r src/requirements.txt
+        
     - name: Docker Login
       # You may pin to the exact commit or the version.
       # uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
@@ -47,9 +51,8 @@ jobs:
         ecr: false
         # Log out from the Docker registry at the end of a job
         logout: true
+        
     - name: Build and push Docker images
-      # You may pin to the exact commit or the version.
-      # uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
       uses: docker/build-push-action@v4.0.0
       with:
         # Build's context is the set of files located in the specified PATH or URL
@@ -66,6 +69,7 @@ jobs:
         push: true # optional, default is false
         # List of tags
         tags: 'andrew86haine/timekeeper:0.1.${{github.run_number}},andrew86haine/timekeeper:latest'# optional
+        
     - name: Azure Login
       uses: Azure/login@v1.4.6
       with:
@@ -77,15 +81,29 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
         enable-AzPSSession: true # optional
-        # Name of the environment. Supported values are azurecloud, azurestack, azureusgovernment, azurechinacloud, azuregermancloud. Default being azurecloud
-        #environment: # optional, default is azurecloud
-        # Set this value to true to enable support for accessing tenants without subscriptions
-        #allow-no-subscriptions: # optional
-        # Provide audience field for access-token. Default value is api://AzureADTokenExchange
-        #audience: # optional, default is api://AzureADTokenExchange
+        
     - name: 'AZ Account Show'
       run: |
         az account show
+        
+    - name: Create AKS Cluster
+      uses: Azure/aks-create-action@1.1
+      with:
+        # Client ID for Service Principal
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        # Client Secret for Service Principal
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_ARM_CLIENT_SECRET }}
+        # Subscription for Service Principal
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        # Tenant for Service Principal
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        # Resource Group for cluster
+        RESOURCE_GROUP_NAME: ${{ vars.AZ_AKS_RG_NAME }}
+        # Name for cluster
+        CLUSTER_NAME: ${{ vars.AZ_AKS_CLUSTER_NAME }}
+        # Size of cluster (dev or test)
+        CLUSTER_SIZE: dev
+        
     - name: Azure Kubernetes Context
       uses: Azure/aks-set-context@v3
       with:
@@ -93,12 +111,7 @@ jobs:
         resource-group: ${{ vars.AZ_AKS_RG_NAME }}
         # AKS Cluster Name
         cluster-name: ${{ vars.AZ_AKS_CLUSTER_NAME }}
-        # AKS Cluster Subscription
-        # subscription: # optional
-        # Get cluster admin credentials. Values: true or false
-        # admin: # optional
-        # Enables kubelogin for non-admin user scenario. Values: true or false
-        # use-kubelogin: # optional
+        
     - name: Create Nginx Ingress Controller
       run: |
         NAMESPACE=${{ vars.TIMEKEEPER_NAMESPACE }}
@@ -115,6 +128,7 @@ jobs:
         else
           echo "Ingress exists, skipping..."
         fi
+        
     - name: Deploy to Kubernetes cluster
       uses: Azure/k8s-deploy@v4.9
       with:
@@ -124,40 +138,11 @@ jobs:
         manifests: deployment/k8s/timekeeper/timekeeper-ingress.yaml, deployment/k8s/timekeeper/timekeeper-namespace.yaml, deployment/k8s/timekeeper/timekeeper-deployment.yaml
         # Fully qualified resource URL of the image(s) to be used for substitutions on the manifest files Example: contosodemo.azurecr.io/helloworld:test
         images: andrew86haine/timekeeper:0.1.${{github.run_number}}
-        # Name of a docker-registry secret that has already been set up within the cluster. Each of these secret names are added under imagePullSecrets field for the workloads found in the input manifest files
-        #imagepullsecrets: # optional
         # Switch whether to pull the images from the registry before deployment to find out Dockerfile's path in order to add it to the annotations
         pull-images: true # optional, default is true
         # Deployment strategy to be used. Allowed values are basic, canary and blue-green
         strategy: basic # default is basic
-        # Route based on service, ingress or SMI for blue-green strategy
-        #route-method: # optional, default is service
-        # Indicates the buffer time in minutes before the switch is made to the green version (max is 300 min ie. 5hrs)
-        #version-switch-buffer: # optional, default is 0
-        # Traffic split method to be used. Allowed values are pod and smi
-        #traffic-split-method: # optional, default is pod
-        # Annotations in the form of key/value pair to be added to TrafficSplit. Relevant only if deployement strategy is blue-green or canary
-        #traffic-split-annotations: # optional
-        # Baseline and canary replicas count. Valid value between 0 to 100 (inclusive)
-        #baseline-and-canary-replicas: # optional, default is 
-        # Percentage of traffic redirect to canary deployment
-        #percentage: # optional, default is 0
         # deploy, promote, or reject
         action: deploy # default is deploy
         # Deploy when a previous deployment already exists. If true then --force argument is added to the apply command
         force: true # optional
-        # Github token
-        #token: # default is ${{ github.token }}
-        # Annotate the target namespace
-        #annotate-namespace: # optional, default is true
-        # True if cluster is AKS private cluster
-        #private-cluster: # optional
-        # Name of resource group - Only required if using private cluster
-        #resource-group: # optional
-        # Resource group name - Only required if using private cluster
-        #name: # optional
-        # True if the insecure-skip-tls-verify option should be used. Input should be 'true' or 'false'.
-        #skip-tls-verify: # optional
-#     - name: Run Tests
-#       run: |
-#         python src/timeKeeper/manage.py test
