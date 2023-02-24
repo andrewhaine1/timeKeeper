@@ -11,7 +11,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /timekeeper-web(/|$)(.*)
+      - path: /timekeeper(/|$)(.*)
         pathType: Prefix
         backend:
           service:
