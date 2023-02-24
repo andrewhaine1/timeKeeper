@@ -12,8 +12,8 @@ permissions:
 
 jobs:
   build:
-    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == create
     environment: prod
+    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create'
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
@@ -155,8 +155,8 @@ jobs:
         force: true # optional
 
   destroy:
-    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == delete
     environment: prod
+    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'delete'
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
