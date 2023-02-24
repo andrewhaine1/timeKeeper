@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   build:
+    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create'
     environment: prod
     runs-on: ubuntu-latest
     strategy:
@@ -80,7 +81,7 @@ jobs:
         # Azure subscriptionId
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
-        enable-AzPSSession: true # optional
+        #enable-AzPSSession: true # optional
         
     - name: 'AZ Account Show'
       run: |
@@ -152,3 +153,55 @@ jobs:
         action: deploy # default is deploy
         # Deploy when a previous deployment already exists. If true then --force argument is added to the apply command
         force: true # optional
+
+  destroy:
+    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'delete'
+    environment: prod
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      # matrix:
+      #   python-version: [3.10.6]
+    
+    steps:
+    - name: Azure Login
+      uses: Azure/login@v1.4.6
+      with:
+        # ClientId of the Azure Service principal created.
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        # TenantId of the Azure Service principal created.
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        # Azure subscriptionId
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
+        #enable-AzPSSession: true # optional
+    
+    - name: 'AZ Account Show'
+      run: |
+        az account show
+
+    - name: Create AKS Cluster
+      uses: Azure/aks-create-action@1.1
+      with:
+        # Client ID for Service Principal
+        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+        # Client Secret for Service Principal
+        ARM_CLIENT_SECRET: ${{ secrets.AZURE_ARM_CLIENT_SECRET }}
+        # Subscription for Service Principal
+        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        # Tenant for Service Principal
+        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        # Create (default) or delete
+        ACTION_TYPE: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE }}
+        # Resource Group for cluster
+        RESOURCE_GROUP_NAME: ${{ vars.AZ_AKS_RG_NAME }}
+        # Name for cluster
+        CLUSTER_NAME: ${{ vars.AZ_AKS_CLUSTER_NAME }}
+        # Size of cluster (dev or test)
+        CLUSTER_SIZE: dev
+        # Name for Storage Account
+        STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
+        # Name for Storage Container
+        STORAGE_CONTAINER_NAME: ${{ vars.AZURE_STORAGE_CONTAINER_NAME }}
+        # Access Key for Storage Container
+        STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}
