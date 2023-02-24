@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create'
+    if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE }} == 'create'
     environment: prod
     runs-on: ubuntu-latest
     strategy:
@@ -155,7 +155,7 @@ jobs:
         force: true # optional
 
   destroy:
-    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'delete'
+    if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE }} == 'delete'
     environment: prod
     runs-on: ubuntu-latest
     strategy:
