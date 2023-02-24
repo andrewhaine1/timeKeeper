@@ -16,7 +16,7 @@ spec:
       - name: timekeeper-web
         image: andrew86haine/timekeeper:latest
         ports:
-        - containerPort: 80
+        - containerPort: 8000
 ---
 apiVersion: v1
 kind: Service
@@ -24,7 +24,9 @@ metadata:
   name: timekeeper-web  
 spec:
   type: ClusterIP
-  ports:
-  - port: 80
   selector:
     app: timekeeper-web
+  ports:
+  - port: 80
+    targetPort: 8000
+  
