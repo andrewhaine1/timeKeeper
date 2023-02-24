@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from timeKeeper.helpers import get_ipaddress
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,9 +26,10 @@ SECRET_KEY = 'django-insecure-m5#lb@ve6q%ufgais4fwccj6b1b)h07c3w3p3yy!2(oau$v1a3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 ALLOWED_HOSTS = ['127.0.0.1','localhost', 'demo.localdev.me', '*']
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1','http://localhost', 'http://0.0.0.0']
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1','http://localhost', 'http://0.0.0.0', get_ipaddress()]
 
 # Application definition
 
