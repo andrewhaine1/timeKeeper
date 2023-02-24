@@ -1,5 +1,5 @@
 name: Django CI
-
+environment: prod
 on:
   push:
     branches: [ "main" ]
@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   build:
-    environment: prod
     if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create'
     runs-on: ubuntu-latest
     strategy:
@@ -155,7 +154,6 @@ jobs:
         force: true # optional
 
   destroy:
-    environment: prod
     if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'delete'
     runs-on: ubuntu-latest
     strategy:
