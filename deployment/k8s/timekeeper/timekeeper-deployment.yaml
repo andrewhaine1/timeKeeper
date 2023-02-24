@@ -17,6 +17,9 @@ spec:
         image: andrew86haine/timekeeper:latest
         ports:
         - containerPort: 8000
+        env:
+        - name: TITLE
+          value: "Welcome to Azure Kubernetes Service (AKS)"
 ---
 apiVersion: v1
 kind: Service
@@ -25,9 +28,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - protocol: TCP
-      port: 80
-      targetPort: 8000
+  - port: 80
+    targetPort: 8000
   selector:
     app: timekeeper-web
     
