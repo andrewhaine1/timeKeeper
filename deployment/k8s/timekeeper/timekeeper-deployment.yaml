@@ -27,6 +27,9 @@ spec:
   selector:
     app: timekeeper-web
   ports:
-  - port: 80
-    targetPort: 8000
+    - port: 80
+      targetPort: 8000
+    
+  
+
   
