@@ -1,5 +1,4 @@
 name: Django CI
-environment: prod
 on:
   push:
     branches: [ "main" ]
@@ -24,6 +23,7 @@ jobs:
     
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       with:
         python-version: ${{ matrix.python-version }}
         
@@ -32,6 +32,7 @@ jobs:
         ls -l
         
     - name: Install Dependencies
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       run: |
         python -m pip install --upgrade pip
         pip install -r src/requirements.txt
@@ -40,6 +41,7 @@ jobs:
       # You may pin to the exact commit or the version.
       # uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
       uses: docker/login-action@v2.1.0
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       with:
         # Server address of Docker registry. If not set then will default to Docker Hub
         registry: docker.io
@@ -54,6 +56,7 @@ jobs:
         
     - name: Build and push Docker images
       uses: docker/build-push-action@v4.0.0
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       with:
         # Build's context is the set of files located in the specified PATH or URL
         context: 'src'# optional
@@ -97,6 +100,8 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         # Tenant for Service Principal
         ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        # Create (default) or delete
+        ACTION_TYPE: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE }}
         # Resource Group for cluster
         RESOURCE_GROUP_NAME: ${{ vars.AZ_AKS_RG_NAME }}
         # Name for cluster
@@ -109,9 +114,10 @@ jobs:
         STORAGE_CONTAINER_NAME: ${{ vars.AZURE_STORAGE_CONTAINER_NAME }}
         # Access Key for Storage Container
         STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}
-        
+
     - name: Azure Kubernetes Context
       uses: Azure/aks-set-context@v3
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       with:
         # Resource Group Name
         resource-group: ${{ vars.AZ_AKS_RG_NAME }}
@@ -119,6 +125,7 @@ jobs:
         cluster-name: ${{ vars.AZ_AKS_CLUSTER_NAME }}
         
     - name: Create Nginx Ingress Controller
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       run: |
         NAMESPACE=${{ vars.TIMEKEEPER_NAMESPACE }}
         echo "Checking for ingress in namespace: $NAMESPACE"
@@ -137,6 +144,7 @@ jobs:
         
     - name: Deploy to Kubernetes cluster
       uses: Azure/k8s-deploy@v4.9
+      if: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE == 'create' }}
       with:
         # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
         namespace: ${{ vars.TIMEKEEPER_NAMESPACE }}
@@ -152,54 +160,3 @@ jobs:
         action: deploy # default is deploy
         # Deploy when a previous deployment already exists. If true then --force argument is added to the apply command
         force: true # optional
-
-  destroy:
-    if: vars.AKS_CLUSTER_CREATE_OR_DELETE == 'delete'
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      # matrix:
-      #   python-version: [3.10.6]
-    
-    steps:
-    - name: Azure Login
-      uses: Azure/login@v1.4.6
-      with:
-        # ClientId of the Azure Service principal created.
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        # TenantId of the Azure Service principal created.
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        # Azure subscriptionId
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        # Set this value to true to enable Azure PowerShell Login in addition to Az CLI login
-        #enable-AzPSSession: true # optional
-    
-    - name: 'AZ Account Show'
-      run: |
-        az account show
-
-    - name: Create AKS Cluster
-      uses: Azure/aks-create-action@1.1
-      with:
-        # Client ID for Service Principal
-        ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-        # Client Secret for Service Principal
-        ARM_CLIENT_SECRET: ${{ secrets.AZURE_ARM_CLIENT_SECRET }}
-        # Subscription for Service Principal
-        ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        # Tenant for Service Principal
-        ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-        # Create (default) or delete
-        ACTION_TYPE: ${{ vars.AKS_CLUSTER_CREATE_OR_DELETE }}
-        # Resource Group for cluster
-        RESOURCE_GROUP_NAME: ${{ vars.AZ_AKS_RG_NAME }}
-        # Name for cluster
-        CLUSTER_NAME: ${{ vars.AZ_AKS_CLUSTER_NAME }}
-        # Size of cluster (dev or test)
-        CLUSTER_SIZE: dev
-        # Name for Storage Account
-        STORAGE_ACCOUNT_NAME: ${{ vars.AZURE_STORAGE_ACCOUNT_NAME }}
-        # Name for Storage Container
-        STORAGE_CONTAINER_NAME: ${{ vars.AZURE_STORAGE_CONTAINER_NAME }}
-        # Access Key for Storage Container
-        STORAGE_ACCESS_KEY: ${{ secrets.AZURE_STORAGE_ACCESS_KEY }}
