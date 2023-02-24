@@ -17,14 +17,14 @@ spec:
           service:
             name: timekeeper-web
             port:
-              number: 80
+              number: 8000
       - path: /(.*)
         pathType: Prefix
         backend:
           service:
             name: timekeeper-web
             port:
-              number: 80
+              number: 8000
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -44,4 +44,4 @@ spec:
           service:
             name: timekeeper-web
             port: 
-              number: 80
+              number: 8000
