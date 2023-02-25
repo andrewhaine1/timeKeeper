@@ -142,7 +142,7 @@ jobs:
         # Choose the target Kubernetes namespace. If the namespace is not provided, the commands will run in the default namespace.
         namespace: ${{ vars.TIMEKEEPER_NAMESPACE }}
         # Path to the manifest files which will be used for deployment.
-        manifests: deployment/k8s/timekeeper/timekeeper-namespace.yaml, deployment/k8s/timekeeper/timekeeper-ingress.yaml, deployment/k8s/timekeeper/timekeeper-deployment.yaml
+        manifests: deployment/k8s/timekeeper/timekeeper-namespace.yaml, deployment/k8s/timekeeper/timekeeper-deployment.yaml, deployment/k8s/timekeeper/timekeeper-ingress.yaml, 
         # Fully qualified resource URL of the image(s) to be used for substitutions on the manifest files Example: contosodemo.azurecr.io/helloworld:test
         images: andrew86haine/timekeeper:0.1.${{github.run_number}}
         # Switch whether to pull the images from the registry before deployment to find out Dockerfile's path in order to add it to the annotations
