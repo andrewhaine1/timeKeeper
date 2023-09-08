@@ -2,6 +2,7 @@
 
 ### A Django Time Management Application.
 
-**Tasks** 
+**To run**
 
-**Notes** 
+docker build -t timekeeper:latest . && docker run --name timekeeper -p 8000:8000 -d timekeeper
+
