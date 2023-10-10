@@ -23,8 +23,10 @@ RUN pip install -r requirements.txt
 
 # copy project
 COPY ./timeKeeper .
+COPY ./seed .
 RUN python manage.py migrate
 RUN python manage.py createsuperuser --noinput
+RUN python manage.py loaddata task_statuses.json
 
 EXPOSE 8000
 
