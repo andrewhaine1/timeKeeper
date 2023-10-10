@@ -49,7 +49,7 @@ class TaskForm(forms.Form):
     full_description = forms.CharField(widget=forms.Textarea(
         attrs={'placeholder': 'Full description', 'autocomplete': 'off'}), required=False, error_messages={'required': 'Please'})
     due_date = TkDateTimeField(required=False)
-    task_status = forms.ModelChoiceField(queryset=TaskStatus.objects.all(), initial=4, required=False)
+    task_status = forms.ModelChoiceField(queryset=TaskStatus.objects.all(), initial=1, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
