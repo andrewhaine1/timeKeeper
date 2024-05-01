@@ -17,3 +17,6 @@ USERNAME 'timeadmin'
 PASSWORD 'TimeAdmin!10'
 
 ***Once you have logged into the django admin account (timeadmin), you can create a user for yourself to starting creating notes and tasks***
+
+#### Default credentials
+This application makes use of a local sqlite db within the container. This is not appropriate for production use but ok for testing
