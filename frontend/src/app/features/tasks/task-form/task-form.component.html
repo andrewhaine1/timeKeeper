@@ -1,0 +1,92 @@
+<div class="page-header">
+  <button mat-icon-button type="button" routerLink="/tasks" matTooltip="Back to tasks">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 class="page-title">{{ isEdit ? 'Edit Task' : 'New Task' }}</h1>
+</div>
+
+@if (loadingData) {
+  <div class="centered">
+    <mat-spinner diameter="52" />
+  </div>
+} @else {
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Short Description</mat-label>
+          <input
+            matInput
+            formControlName="shortDescription"
+            placeholder="Brief summary of the task"
+            maxlength="100"
+          />
+          <mat-hint align="end">{{ descLength }}/100</mat-hint>
+          @if (form.get('shortDescription')?.errors?.['required'] && form.get('shortDescription')?.touched) {
+            <mat-error>Short description is required</mat-error>
+          }
+          @if (form.get('shortDescription')?.errors?.['maxlength']) {
+            <mat-error>Maximum 100 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            rows="5"
+            placeholder="Detailed description (optional)"
+          ></textarea>
+        </mat-form-field>
+
+        <!-- Due date + time row -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="flex-field">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dueDate" placeholder="DD/MM/YYYY" />
+            <mat-datepicker-toggle matIconSuffix [for]="picker" />
+            <mat-datepicker #picker />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="time-field">
+            <mat-label>Due Time</mat-label>
+            <input matInput type="time" formControlName="dueTime" placeholder="HH:MM" />
+            <mat-icon matSuffix>schedule</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Status row -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            @for (s of statuses; track s._id) {
+              <mat-option [value]="s._id">{{ s.name }}</mat-option>
+            }
+          </mat-select>
+          @if (form.get('status')?.errors?.['required'] && form.get('status')?.touched) {
+            <mat-error>Status is required</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/tasks">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || loading"
+          >
+            @if (loading) {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ isEdit ? 'Update Task' : 'Create Task' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+}

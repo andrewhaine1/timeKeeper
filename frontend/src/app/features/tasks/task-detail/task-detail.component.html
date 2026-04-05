@@ -1,0 +1,184 @@
+@if (loading) {
+  <div class="centered">
+    <mat-spinner diameter="52" />
+  </div>
+} @else if (task) {
+  <div class="page-header">
+    <button mat-icon-button type="button" routerLink="/tasks" matTooltip="Back to tasks">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="page-title">Task Detail</h1>
+    <span class="header-spacer"></span>
+    <button mat-stroked-button type="button" [routerLink]="['/tasks', task._id, 'edit']">
+      <mat-icon>edit</mat-icon>
+      Edit
+    </button>
+    <button mat-stroked-button type="button" color="warn" (click)="deleteTask()">
+      <mat-icon>delete_outline</mat-icon>
+      Delete
+    </button>
+  </div>
+
+  <div class="detail-layout">
+
+    <!-- Left column: description + comments -->
+    <div class="main-column">
+
+      <!-- Main content card -->
+      <mat-card class="main-card" [ngClass]="'card--' + urgency">
+        <mat-card-header>
+          <mat-card-title class="task-title">{{ task.shortDescription }}</mat-card-title>
+          <mat-card-subtitle>
+            <span class="urgency-badge" [ngClass]="urgencyClass">{{ urgencyLabel }}</span>
+            <div class="meta-row">
+              <span class="meta-item">
+                <mat-icon>add_circle_outline</mat-icon>
+                Created {{ task.createdAt | date : 'dd MMM yyyy, HH:mm' }}
+              </span>
+              <span class="meta-item">
+                <mat-icon>update</mat-icon>
+                Updated {{ task.updatedAt | date : 'dd MMM yyyy, HH:mm' }}
+              </span>
+            </div>
+          </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-divider />
+
+        <mat-card-content class="description-content">
+          @if (task.description) {
+            <p class="description">{{ task.description }}</p>
+          } @else {
+            <p class="no-description">No description provided.</p>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Comments card -->
+      <mat-card class="comments-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>comment</mat-icon>
+            Comments
+            @if (comments.length) {
+              <span class="comment-count">{{ comments.length }}</span>
+            }
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content>
+
+          <!-- Comment list -->
+          @if (loadingComments) {
+            <div class="centered-sm"><mat-spinner diameter="32" /></div>
+          } @else if (comments.length === 0) {
+            <p class="no-comments">No comments yet. Be the first to add one.</p>
+          } @else {
+            <div class="comment-list">
+              @for (comment of comments; track comment._id) {
+                <div class="comment">
+                  <div class="comment-header">
+                    <span class="comment-author">{{ comment.authorUsername }}</span>
+                    <span class="comment-date">{{ comment.createdAt | date : 'dd MMM yyyy, HH:mm' }}</span>
+                    @if (comment.authorUsername === currentUsername) {
+                      <span class="comment-actions">
+                        <button mat-icon-button type="button" (click)="startEdit(comment)" matTooltip="Edit">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button type="button" color="warn" (click)="deleteComment(comment)" matTooltip="Delete">
+                          <mat-icon>delete_outline</mat-icon>
+                        </button>
+                      </span>
+                    }
+                  </div>
+
+                  @if (editingCommentId === comment._id) {
+                    <!-- Inline edit -->
+                    <mat-form-field appearance="outline" class="full-width">
+                      <textarea matInput [(ngModel)]="editText" rows="3" placeholder="Edit comment…"></textarea>
+                    </mat-form-field>
+                    <div class="edit-actions">
+                      <button mat-button type="button" (click)="cancelEdit()">Cancel</button>
+                      <button mat-raised-button color="primary" type="button" (click)="saveEdit(comment)" [disabled]="!editText.trim()">Save</button>
+                    </div>
+                  } @else {
+                    <p class="comment-text">{{ comment.text }}</p>
+                  }
+
+                  <mat-divider />
+                </div>
+              }
+            </div>
+          }
+
+          <!-- New comment form -->
+          <div class="new-comment">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Add a comment</mat-label>
+              <textarea matInput [(ngModel)]="newCommentText" rows="3" placeholder="Write your comment here…"></textarea>
+            </mat-form-field>
+            <div class="new-comment-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="button"
+                (click)="addComment()"
+                [disabled]="!newCommentText.trim() || savingComment"
+              >
+                @if (savingComment) {
+                  <mat-spinner diameter="18" />
+                } @else {
+                  Post Comment
+                }
+              </button>
+            </div>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+
+    <!-- Sidebar -->
+    <mat-card class="sidebar-card">
+      <mat-card-content>
+
+        <div class="sidebar-section">
+          <p class="sidebar-label"><mat-icon>flag</mat-icon> Status</p>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-select
+              [ngModel]="task.status._id"
+              (ngModelChange)="updateStatus($event)"
+              [disabled]="updatingStatus"
+            >
+              @for (s of statuses; track s._id) {
+                <mat-option [value]="s._id">{{ s.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if (updatingStatus) {
+            <mat-spinner diameter="18" class="status-spinner" />
+          }
+        </div>
+
+        <mat-divider />
+
+        <div class="sidebar-section">
+          <p class="sidebar-label"><mat-icon>event</mat-icon> Due Date</p>
+          @if (task.dueDate) {
+            <p class="sidebar-value" [ngClass]="{ 'overdue-text': isOverdue }">
+              {{ task.dueDate | date : 'dd MMM yyyy' }}
+            </p>
+            <p class="sidebar-value" [ngClass]="{ 'overdue-text': isOverdue }">
+              {{ task.dueDate | date : 'HH:mm' }}
+            </p>
+          } @else {
+            <p class="sidebar-value muted">No due date set</p>
+          }
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+}

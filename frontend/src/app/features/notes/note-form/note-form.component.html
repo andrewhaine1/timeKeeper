@@ -1,0 +1,57 @@
+<div class="page-header">
+  <button mat-icon-button routerLink="/notes" matTooltip="Back to notes">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <h1 class="page-title">{{ isEdit ? 'Edit Note' : 'New Note' }}</h1>
+</div>
+
+@if (loadingData) {
+  <div class="centered">
+    <mat-spinner diameter="52" />
+  </div>
+} @else {
+  <mat-card class="form-card">
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Note title" />
+          @if (form.get('title')?.errors?.['required'] && form.get('title')?.touched) {
+            <mat-error>Title is required</mat-error>
+          }
+          @if (form.get('title')?.errors?.['maxlength']) {
+            <mat-error>Maximum 200 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Content</mat-label>
+          <textarea
+            matInput
+            formControlName="text"
+            rows="12"
+            placeholder="Write your note here..."
+          ></textarea>
+        </mat-form-field>
+
+        <div class="form-actions">
+          <button mat-stroked-button type="button" routerLink="/notes">Cancel</button>
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="form.invalid || loading"
+          >
+            @if (loading) {
+              <mat-spinner diameter="20" />
+            } @else {
+              {{ isEdit ? 'Update Note' : 'Create Note' }}
+            }
+          </button>
+        </div>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+}

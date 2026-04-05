@@ -1,0 +1,100 @@
+<div class="page-header">
+  <h1 class="page-title">Tasks</h1>
+  <button mat-raised-button color="primary" type="button" routerLink="/tasks/new">
+    <mat-icon>add</mat-icon>
+    New Task
+  </button>
+</div>
+
+<div class="filters">
+  <mat-form-field appearance="outline" class="status-filter">
+    <mat-label>Filter by Status</mat-label>
+    <mat-select [(ngModel)]="selectedStatusId" (ngModelChange)="loadTasks()">
+      <mat-option value="">All statuses</mat-option>
+      @for (s of statuses; track s._id) {
+        <mat-option [value]="s._id">{{ s.name }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+@if (loading) {
+  <div class="centered">
+    <mat-spinner diameter="52" />
+  </div>
+} @else if (tasks.length === 0) {
+  <div class="empty-state">
+    <mat-icon>task_alt</mat-icon>
+    <p>No tasks found. Click <strong>New Task</strong> to get started.</p>
+  </div>
+} @else {
+  <div class="task-grid">
+    @for (task of tasks; track task._id) {
+      <mat-card [ngClass]="'card--' + urgencyClass(task).replace('urgency-badge--','')">
+
+        <!-- Clickable area navigates to task detail -->
+        <a class="card-link" [routerLink]="['/tasks', task._id]">
+          <mat-card-header>
+            <mat-card-title class="task-title">{{ task.shortDescription }}</mat-card-title>
+            <mat-card-subtitle>
+              <span class="urgency-badge" [ngClass]="urgencyClass(task)">
+                {{ urgencyLabel(task) }}
+              </span>
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          @if (task.description) {
+            <mat-card-content>
+              <p class="description">{{ task.description }}</p>
+            </mat-card-content>
+          }
+        </a>
+
+        <mat-card-content class="status-content">
+          <!-- Inline status selector — stops click propagation to the link -->
+          <mat-form-field appearance="outline" class="status-select" (click)="$event.stopPropagation()">
+            <mat-label>Status</mat-label>
+            <mat-select
+              [ngModel]="task.status._id"
+              (ngModelChange)="updateStatus(task, $event)"
+            >
+              @for (s of statuses; track s._id) {
+                <mat-option [value]="s._id">{{ s.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </mat-card-content>
+
+        <mat-divider />
+
+        <mat-card-actions class="card-actions">
+          @if (task.dueDate) {
+            <span class="due-date" [ngClass]="{ 'due-date--overdue': isOverdue(task) }">
+              <mat-icon>event</mat-icon>
+              {{ task.dueDate | date : 'dd MMM yyyy, HH:mm' }}
+            </span>
+          }
+          <span class="actions-spacer"></span>
+          <button
+            mat-icon-button
+            type="button"
+            [routerLink]="['/tasks', task._id, 'edit']"
+            matTooltip="Edit task"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            color="warn"
+            (click)="deleteTask(task)"
+            matTooltip="Delete task"
+          >
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </mat-card-actions>
+
+      </mat-card>
+    }
+  </div>
+}

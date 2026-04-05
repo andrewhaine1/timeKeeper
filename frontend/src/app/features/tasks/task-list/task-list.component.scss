@@ -1,0 +1,141 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+.filters {
+  margin-bottom: 20px;
+
+  .status-filter {
+    min-width: 220px;
+  }
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+  opacity: 0.55;
+
+  mat-icon {
+    font-size: 72px;
+    height: 72px;
+    width: 72px;
+    margin-bottom: 12px;
+    display: block;
+  }
+}
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+mat-card {
+  border-radius: 10px !important;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  &.card--approaching { border-left: 4px solid #4caf50; }
+  &.card--urgent      { border-left: 4px solid #ff9800; }
+  &.card--overdue     { border-left: 4px solid #f44336; }
+}
+
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover .task-title {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.status-content {
+  padding-top: 0 !important;
+}
+
+.task-title {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+
+  mat-icon {
+    font-size: 14px;
+    height: 14px;
+    width: 14px;
+    margin-right: 2px;
+  }
+}
+
+.status-select {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.description {
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  max-height: 72px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px !important;
+
+  .due-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.8rem;
+    opacity: 0.65;
+    padding-left: 8px;
+
+    mat-icon {
+      font-size: 15px;
+      height: 15px;
+      width: 15px;
+    }
+
+    &.due-date--overdue {
+      color: #f44336;
+      opacity: 1;
+      font-weight: 500;
+    }
+  }
+
+  .actions-spacer {
+    flex: 1;
+  }
+}

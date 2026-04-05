@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: timekeeper-mongodb
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: timekeeper
+    networks:
+      - timekeeper-net
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: timekeeper-api
+    restart: always
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/timekeeper
+      JWT_SECRET: timekeeper-dev-secret-change-in-prod
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - timekeeper-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: timekeeper-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    networks:
+      - timekeeper-net
+
+volumes:
+  mongo-data:
+
+networks:
+  timekeeper-net:
+    driver: bridge

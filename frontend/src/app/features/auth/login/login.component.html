@@ -1,0 +1,133 @@
+<div class="login-container">
+  <!-- Theme toggle in corner -->
+  <button
+    mat-icon-button
+    class="theme-toggle"
+    (click)="theme.toggle()"
+    [attr.aria-label]="theme.isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+  >
+    <mat-icon>{{ theme.isDark ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-icon mat-card-avatar class="logo-icon">schedule</mat-icon>
+      <mat-card-title>TimeKeeper</mat-card-title>
+      <mat-card-subtitle>Manage your time effectively</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group animationDuration="200ms">
+
+        <!-- Sign In -->
+        <mat-tab label="Sign In">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="auth-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" autocomplete="username" />
+              <mat-icon matSuffix>person</mat-icon>
+              @if (loginForm.get('username')?.errors?.['required'] && loginForm.get('username')?.touched) {
+                <mat-error>Username is required</mat-error>
+              }
+              @if (loginForm.get('username')?.errors?.['minlength'] && loginForm.get('username')?.touched) {
+                <mat-error>Minimum 3 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                autocomplete="current-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hidePassword = !hidePassword"
+                [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+              >
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (loginForm.get('password')?.errors?.['required'] && loginForm.get('password')?.touched) {
+                <mat-error>Password is required</mat-error>
+              }
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-btn"
+              [disabled]="loginForm.invalid || loading"
+            >
+              @if (loading) {
+                <mat-spinner diameter="20" />
+              } @else {
+                Sign In
+              }
+            </button>
+          </form>
+        </mat-tab>
+
+        <!-- Register -->
+        <mat-tab label="Register">
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="auth-form">
+            <mat-form-field appearance="outline">
+              <mat-label>Username</mat-label>
+              <input matInput formControlName="username" autocomplete="username" />
+              <mat-icon matSuffix>person</mat-icon>
+              @if (registerForm.get('username')?.errors?.['required'] && registerForm.get('username')?.touched) {
+                <mat-error>Username is required</mat-error>
+              }
+              @if (registerForm.get('username')?.errors?.['minlength'] && registerForm.get('username')?.touched) {
+                <mat-error>Minimum 3 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Password</mat-label>
+              <input
+                matInput
+                [type]="hidePassword ? 'password' : 'text'"
+                formControlName="password"
+                autocomplete="new-password"
+              />
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                (click)="hidePassword = !hidePassword"
+              >
+                <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+              @if (registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched) {
+                <mat-error>Password is required</mat-error>
+              }
+              @if (registerForm.get('password')?.errors?.['minlength'] && registerForm.get('password')?.touched) {
+                <mat-error>Minimum 6 characters</mat-error>
+              }
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              class="submit-btn"
+              [disabled]="registerForm.invalid || loading"
+            >
+              @if (loading) {
+                <mat-spinner diameter="20" />
+              } @else {
+                Create Account
+              }
+            </button>
+          </form>
+        </mat-tab>
+
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

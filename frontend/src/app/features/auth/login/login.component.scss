@@ -1,0 +1,57 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  position: relative;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding-bottom: 0;
+    margin-bottom: 4px;
+
+    .logo-icon {
+      font-size: 44px;
+      height: 44px;
+      width: 44px;
+      color: #3f51b5;
+      background: transparent;
+      border-radius: 0;
+    }
+  }
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 0 8px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .submit-btn {
+    width: 100%;
+    height: 44px;
+    margin-top: 8px;
+    font-size: 1rem;
+
+    mat-spinner {
+      display: inline-block;
+      margin: auto;
+    }
+  }
+}

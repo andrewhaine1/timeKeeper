@@ -1,0 +1,62 @@
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 500;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  padding: 80px 0;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 80px 0;
+  opacity: 0.55;
+
+  mat-icon {
+    font-size: 72px;
+    height: 72px;
+    width: 72px;
+    margin-bottom: 12px;
+    display: block;
+  }
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+mat-card {
+  border-radius: 10px !important;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14) !important;
+  }
+}
+
+.note-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.note-text {
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  max-height: 90px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+}
