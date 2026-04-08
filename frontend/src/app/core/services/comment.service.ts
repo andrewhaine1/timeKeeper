@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from './config.service';
 
 export interface Comment {
   _id: string;
@@ -15,7 +15,9 @@ export interface Comment {
 @Injectable({ providedIn: 'root' })
 export class CommentService {
   private http = inject(HttpClient);
-  private base = environment.apiUrl;
+  private config = inject(ConfigService);
+
+  private get base() { return this.config.apiUrl; }
 
   getComments(taskId: string) {
     return this.http.get<Comment[]>(`${this.base}/api/tasks/${taskId}/comments`);

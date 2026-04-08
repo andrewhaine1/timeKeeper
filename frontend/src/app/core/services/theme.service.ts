@@ -9,13 +9,12 @@ export class ThemeService {
 
   dark$ = this._isDark$.asObservable();
 
-  get isDark(): boolean {
-    return this._isDark$.value;
+  constructor() {
+    this._applyTheme(this._isDark$.value);
   }
 
-  /** Call once at app shell init to apply persisted preference. */
-  init() {
-    this._applyTheme(this._isDark$.value);
+  get isDark(): boolean {
+    return this._isDark$.value;
   }
 
   toggle() {

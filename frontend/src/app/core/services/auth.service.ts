@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, tap } from 'rxjs';
 import { Router } from '@angular/router';
-import { environment } from '../../../environments/environment';
+import { ConfigService } from './config.service';
 
 export interface User {
   _id: string;
@@ -18,7 +18,9 @@ export interface AuthResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private base = environment.apiUrl;
+  private config = inject(ConfigService);
+
+  private get base() { return this.config.apiUrl; }
 
   private currentUser$ = new BehaviorSubject<User | null>(this.loadUser());
   user$ = this.currentUser$.asObservable();
