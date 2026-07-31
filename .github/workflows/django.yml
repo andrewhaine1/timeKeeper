@@ -2,8 +2,12 @@ name: Django CI
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - "mobile/**"
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - "mobile/**"
 
 permissions:
   id-token: write

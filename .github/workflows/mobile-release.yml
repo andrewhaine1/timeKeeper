@@ -1,9 +1,8 @@
 name: Mobile Release
 
-# Triggered by merging to main. The release version comes from mobile/app.json's
-# "version" field, which you bump as part of whatever PR is meant to ship a release.
-# If that version has already been tagged/released, this is a no-op — merging
-# without a version bump does not create a new release.
+# Triggered by every merge to main that touches mobile/ — the release version is
+# computed automatically (latest vX.Y.Z tag, patch +1; 0.0.1 if none exist yet).
+# There's no manual version bump and no way to opt a given merge out of releasing.
 on:
   push:
     branches: [main]
@@ -18,28 +17,32 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.check.outputs.version }}
-      should_release: ${{ steps.check.outputs.should_release }}
+      version: ${{ steps.next.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # need full tag history to find the latest release
 
-      - name: Check whether this version has already been released
-        id: check
+      - name: Compute next patch version
+        id: next
         run: |
-          VERSION=$(node -e "console.log(require('./mobile/app.json').expo.version)")
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          if git ls-remote --exit-code --tags origin "refs/tags/v$VERSION" > /dev/null 2>&1; then
-            echo "v$VERSION is already tagged — skipping release (bump mobile/app.json's version to ship a new one)"
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          LATEST=$(git tag -l 'v*.*.*' | sort -V | tail -n1)
+          if [ -z "$LATEST" ]; then
+            NEXT="0.0.1"
           else
-            echo "should_release=true" >> "$GITHUB_OUTPUT"
+            BASE="${LATEST#v}"
+            MAJOR=$(echo "$BASE" | cut -d. -f1)
+            MINOR=$(echo "$BASE" | cut -d. -f2)
+            PATCH=$(echo "$BASE" | cut -d. -f3)
+            NEXT="$MAJOR.$MINOR.$((PATCH + 1))"
           fi
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "Latest tag: ${LATEST:-<none>} — next release: v$NEXT"
 
   # --- Destination 1: GitHub Release, as a directly-installable APK ---
   release-github:
     needs: check-version
-    if: needs.check-version.outputs.should_release == 'true'
     environment: prod
     runs-on: ubuntu-latest
     defaults:
@@ -62,13 +65,15 @@ jobs:
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Set Android version code
+      - name: Set app version and Android version code
         env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
           VERSION_CODE: ${{ github.run_number }}
         run: |
           node -e "
             const fs = require('fs');
             const config = JSON.parse(fs.readFileSync('./app.json', 'utf8'));
+            config.expo.version = process.env.APP_VERSION;
             config.expo.android.versionCode = Number(process.env.VERSION_CODE);
             fs.writeFileSync('./app.json', JSON.stringify(config, null, 2) + '\n');
           "
@@ -118,7 +123,6 @@ jobs:
   # Console approval still pending) — nothing else in this workflow depends on it.
   submit-play-store:
     needs: check-version
-    if: needs.check-version.outputs.should_release == 'true'
     environment: prod
     runs-on: ubuntu-latest
     defaults:
@@ -145,6 +149,20 @@ jobs:
       - name: Install dependencies
         if: steps.creds.outputs.present == 'true'
         run: npm ci
+
+      - name: Set app version
+        if: steps.creds.outputs.present == 'true'
+        env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const config = JSON.parse(fs.readFileSync('./app.json', 'utf8'));
+            config.expo.version = process.env.APP_VERSION;
+            config.expo.android.versionCode = Number(process.env.VERSION_CODE);
+            fs.writeFileSync('./app.json', JSON.stringify(config, null, 2) + '\n');
+          "
 
       - name: Set up EAS
         if: steps.creds.outputs.present == 'true'
