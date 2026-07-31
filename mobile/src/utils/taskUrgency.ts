@@ -1,5 +1,5 @@
-import { Task } from '../services/task.service';
-import { TASK_CONFIG } from '../config';
+import { Task } from '@/src/api/tasks';
+import { TASK_CONFIG } from '@/src/config';
 
 /**
  * Urgency levels drive both the badge colour and the left-border colour on task cards.
@@ -31,7 +31,6 @@ export function getTaskUrgency(
   if (name === 'Closed') return 'closed';
   if (name === 'New') return 'new';
 
-  // In Progress from here on
   if (!task.dueDate) return 'normal';
 
   const msRemaining = new Date(task.dueDate).getTime() - Date.now();
@@ -48,4 +47,14 @@ export const URGENCY_LABELS: Record<UrgencyLevel, string> = {
   completed: 'Completed',
   closed: 'Closed',
   normal: 'In Progress',
+};
+
+export const URGENCY_COLORS: Record<UrgencyLevel, string> = {
+  new: '#9e9e9e',
+  approaching: '#2e7d32',
+  urgent: '#fd7e14',
+  overdue: '#dc3545',
+  completed: '#28a745',
+  closed: '#495057',
+  normal: '#0d6efd',
 };

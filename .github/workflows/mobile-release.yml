@@ -1,0 +1,190 @@
+name: Mobile Release
+
+# Triggered by every merge to main that touches mobile/ — the release version is
+# computed automatically (latest vX.Y.Z tag, patch +1; 0.0.1 if none exist yet).
+# There's no manual version bump and no way to opt a given merge out of releasing.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-release.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.next.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # need full tag history to find the latest release
+
+      - name: Compute next patch version
+        id: next
+        run: |
+          LATEST=$(git tag -l 'v*.*.*' | sort -V | tail -n1)
+          if [ -z "$LATEST" ]; then
+            NEXT="0.0.1"
+          else
+            BASE="${LATEST#v}"
+            MAJOR=$(echo "$BASE" | cut -d. -f1)
+            MINOR=$(echo "$BASE" | cut -d. -f2)
+            PATCH=$(echo "$BASE" | cut -d. -f3)
+            NEXT="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+          echo "version=$NEXT" >> "$GITHUB_OUTPUT"
+          echo "Latest tag: ${LATEST:-<none>} — next release: v$NEXT"
+
+  # --- Destination 1: GitHub Release, as a directly-installable APK ---
+  release-github:
+    needs: check-version
+    environment: prod
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Set app version and Android version code
+        env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const config = JSON.parse(fs.readFileSync('./app.json', 'utf8'));
+            config.expo.version = process.env.APP_VERSION;
+            config.expo.android.versionCode = Number(process.env.VERSION_CODE);
+            fs.writeFileSync('./app.json', JSON.stringify(config, null, 2) + '\n');
+          "
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK on EAS
+        id: build
+        run: |
+          eas build --platform android --profile production --non-interactive --wait --json > eas-build-result.json
+          cat eas-build-result.json
+          BUILD_URL=$(node -e "console.log(JSON.parse(require('fs').readFileSync('eas-build-result.json','utf8'))[0].artifacts.buildUrl)")
+          if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "undefined" ]; then
+            echo "Could not find a build artifact URL in the EAS build result" >&2
+            exit 1
+          fi
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK
+        env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
+          BUILD_URL: ${{ steps.build.outputs.build_url }}
+        run: |
+          curl -fL -o "timekeeper-${APP_VERSION}.apk" "$BUILD_URL"
+
+      - name: Tag release
+        env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
+        run: |
+          git tag "v${APP_VERSION}"
+          git push origin "v${APP_VERSION}"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ needs.check-version.outputs.version }}"
+          name: "TimeKeeper v${{ needs.check-version.outputs.version }}"
+          generate_release_notes: true
+          files: mobile/timekeeper-${{ needs.check-version.outputs.version }}.apk
+
+  # --- Destination 2: Google Play (internal testing track) ---
+  # Skips gracefully if GOOGLE_SERVICE_ACCOUNT_KEY isn't configured yet (e.g. Play
+  # Console approval still pending) — nothing else in this workflow depends on it.
+  submit-play-store:
+    needs: check-version
+    environment: prod
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Check Play Store credentials are configured
+        id: creds
+        env:
+          KEY_PRESENT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY != '' }}
+        run: echo "present=$KEY_PRESENT" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Node
+        if: steps.creds.outputs.present == 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        if: steps.creds.outputs.present == 'true'
+        run: npm ci
+
+      - name: Set app version
+        if: steps.creds.outputs.present == 'true'
+        env:
+          APP_VERSION: ${{ needs.check-version.outputs.version }}
+          VERSION_CODE: ${{ github.run_number }}
+        run: |
+          node -e "
+            const fs = require('fs');
+            const config = JSON.parse(fs.readFileSync('./app.json', 'utf8'));
+            config.expo.version = process.env.APP_VERSION;
+            config.expo.android.versionCode = Number(process.env.VERSION_CODE);
+            fs.writeFileSync('./app.json', JSON.stringify(config, null, 2) + '\n');
+          "
+
+      - name: Set up EAS
+        if: steps.creds.outputs.present == 'true'
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Write Play service account key
+        if: steps.creds.outputs.present == 'true'
+        env:
+          SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+        run: echo "$SERVICE_ACCOUNT_KEY" > google-service-account.json
+
+      - name: Build Android App Bundle on EAS
+        if: steps.creds.outputs.present == 'true'
+        run: eas build --platform android --profile play --non-interactive --wait
+
+      - name: Submit to Play Store (internal track)
+        if: steps.creds.outputs.present == 'true'
+        run: eas submit --platform android --profile play --latest --non-interactive
+
+      - name: Skipped
+        if: steps.creds.outputs.present != 'true'
+        run: echo "GOOGLE_SERVICE_ACCOUNT_KEY secret not set — skipping Play Store submission until Play Console access is ready."

@@ -1,0 +1,67 @@
+name: Mobile Build (PR check)
+
+# Validates that the Android app actually builds on every PR touching mobile/.
+# Produces a downloadable APK attached to the workflow run for manual testing,
+# but never creates a release — that only happens on merge to main (see
+# mobile-release.yml).
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "mobile/**"
+      - ".github/workflows/mobile-build.yml"
+
+jobs:
+  build:
+    environment: prod
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Set up EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK on EAS
+        id: build
+        run: |
+          eas build --platform android --profile production --non-interactive --wait --json > eas-build-result.json
+          cat eas-build-result.json
+          BUILD_URL=$(node -e "console.log(JSON.parse(require('fs').readFileSync('eas-build-result.json','utf8'))[0].artifacts.buildUrl)")
+          if [ -z "$BUILD_URL" ] || [ "$BUILD_URL" = "undefined" ]; then
+            echo "Could not find a build artifact URL in the EAS build result" >&2
+            exit 1
+          fi
+          echo "build_url=$BUILD_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK
+        env:
+          BUILD_URL: ${{ steps.build.outputs.build_url }}
+        run: curl -fL -o "timekeeper-pr-${{ github.event.pull_request.number }}.apk" "$BUILD_URL"
+
+      - name: Upload APK as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: timekeeper-pr-${{ github.event.pull_request.number }}
+          path: mobile/timekeeper-pr-${{ github.event.pull_request.number }}.apk
+          retention-days: 30
