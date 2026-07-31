@@ -45,3 +45,6 @@ yarn-error.*
 eas-build-result.json
 *.apk
 *.aab
+
+# Play Store service account key (CI writes this from a secret; never commit it)
+google-service-account.json
